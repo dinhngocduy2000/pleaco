@@ -1,0 +1,6 @@
+[submodule "pleaco-frontend"]
+	path = pleaco-frontend
+	url = ./pleaco-frontend
+[submodule "pleaco-backend"]
+	path = pleaco-backend
+	url = ./pleaco-backend

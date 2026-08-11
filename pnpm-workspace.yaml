@@ -1,0 +1,6 @@
+packages:
+  - 'pleaco-frontend'
+
+onlyBuiltDependencies:
+  - esbuild
+  - '@biomejs/cli-darwin-arm64'

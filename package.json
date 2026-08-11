@@ -1,0 +1,14 @@
+{
+  "name": "pleaco",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@10.18.3",
+  "scripts": {
+    "dev": "pnpm --filter pleaco-frontend dev",
+    "build": "pnpm --filter pleaco-frontend build",
+    "test": "pnpm --filter pleaco-frontend test",
+    "test:e2e": "pnpm --filter pleaco-frontend test:e2e",
+    "lint": "pnpm --filter pleaco-frontend lint",
+    "format": "pnpm --filter pleaco-frontend format"
+  }
+}
