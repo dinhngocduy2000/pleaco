@@ -1,10 +1,11 @@
 import json
+import threading
 from pathlib import Path
 
 import paho.mqtt.client as mqtt
 
 from app.config import Settings
-from app.models import status_message
+from app.models import heartbeat_message, status_message
 
 
 class MockRobotMqttClient:
@@ -12,6 +13,7 @@ class MockRobotMqttClient:
         self.settings = settings
         self.sequence_number = self._load_sequence_number()
         self.topic = f"pleco/robots/{settings.ROBOT_ID}/status"
+        self.connected = threading.Event()
         self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id=str(settings.ROBOT_ID))
         if settings.MQTT_USERNAME:
             self.client.username_pw_set(settings.MQTT_USERNAME, settings.MQTT_PASSWORD or None)
@@ -43,6 +45,7 @@ class MockRobotMqttClient:
         self.client.loop_start()
 
     def disconnect(self) -> None:
+        self.connected.clear()
         self.publish("robot.offline", wait_for_confirmation=True)
         self.client.disconnect()
         self.client.loop_stop()
@@ -64,9 +67,17 @@ class MockRobotMqttClient:
             flush=True,
         )
 
+    def publish_heartbeat(self) -> None:
+        if not self.connected.is_set():
+            return
+        message = heartbeat_message(robot_id=self.settings.ROBOT_ID)
+        info = self.client.publish(self.topic, message.model_dump_json(), qos=1, retain=False)
+        print(f"Queued robot.heartbeat topic={self.topic}", flush=True)
+
     def _on_connect(self, _client, _userdata, _flags, reason_code, _properties) -> None:
         if reason_code == 0:
             print("Connected to MQTT broker", flush=True)
+            self.connected.set()
             self.publish("robot.online")
         else:
             print(f"MQTT broker rejected connection: {reason_code}", flush=True)
@@ -75,6 +86,7 @@ class MockRobotMqttClient:
         print(f"MQTT publish confirmed message_id={message_id}", flush=True)
 
     def _on_disconnect(self, _client, _userdata, disconnect_flags, reason_code, _properties) -> None:
+        self.connected.clear()
         if reason_code != 0:
             print(
                 f"Unexpected MQTT disconnect: {reason_code} flags={disconnect_flags}",
