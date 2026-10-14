@@ -1,0 +1,60 @@
+x-mock-device-base: &mock-device-base
+  build:
+    context: .
+  image: pleaco-mock-device
+  environment: &mock-device-environment
+    MQTT_HOST: host.docker.internal
+    MQTT_PORT: 1883
+    ROBOT_INITIAL_SEQUENCE: 1000
+    ROBOT_STATE_PATH: /data/sequence.txt
+
+services:
+  mock-device-1:
+    <<: *mock-device-base
+    environment:
+      <<: *mock-device-environment
+      ROBOT_ID: d67e006a-c9bd-4dbf-852d-15224a5a283d
+      ROBOT_SERIAL_NUM: PLC-001
+      ROBOT_IP_ADDRESS: 192.168.10.24
+    volumes:
+      - ./data/robot-1:/data
+
+  mock-device-2:
+    <<: *mock-device-base
+    environment:
+      <<: *mock-device-environment
+      ROBOT_ID: ${ROBOT_2_ID:-}
+      ROBOT_SERIAL_NUM: PLEA-001
+      ROBOT_IP_ADDRESS: 192.168.0.0
+    volumes:
+      - ./data/robot-2:/data
+
+  mock-device-3:
+    <<: *mock-device-base
+    environment:
+      <<: *mock-device-environment
+      ROBOT_ID: ${ROBOT_3_ID:-}
+      ROBOT_SERIAL_NUM: PLEA-002
+      ROBOT_IP_ADDRESS: 192.168.1.2
+    volumes:
+      - ./data/robot-3:/data
+
+  mock-device-4:
+    <<: *mock-device-base
+    environment:
+      <<: *mock-device-environment
+      ROBOT_ID: ${ROBOT_4_ID:-}
+      ROBOT_SERIAL_NUM: PLC-004
+      ROBOT_IP_ADDRESS: 192.168.10.27
+    volumes:
+      - ./data/robot-4:/data
+
+  mock-device-5:
+    <<: *mock-device-base
+    environment:
+      <<: *mock-device-environment
+      ROBOT_ID: ${ROBOT_5_ID:-}
+      ROBOT_SERIAL_NUM: PLC-005
+      ROBOT_IP_ADDRESS: 192.168.10.28
+    volumes:
+      - ./data/robot-5:/data
