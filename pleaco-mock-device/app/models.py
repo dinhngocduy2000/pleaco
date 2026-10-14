@@ -17,6 +17,15 @@ class RobotStatusMessage(BaseModel):
     data: dict[str, str]
 
 
+class RobotHeartbeatMessage(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    message_id: UUID
+    robot_id: UUID
+    event: Literal["robot.heartbeat"]
+    timestamp: datetime
+
+
 def status_message(
     *,
     robot_id: UUID,
@@ -33,4 +42,13 @@ def status_message(
         sequence_number=sequence_number,
         timestamp=datetime.now(timezone.utc),
         data={"connection_status": status},
+    )
+
+
+def heartbeat_message(*, robot_id: UUID) -> RobotHeartbeatMessage:
+    return RobotHeartbeatMessage(
+        message_id=uuid4(),
+        robot_id=robot_id,
+        event="robot.heartbeat",
+        timestamp=datetime.now(timezone.utc),
     )
