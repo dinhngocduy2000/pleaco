@@ -23,7 +23,7 @@ services:
     <<: *mock-device-base
     environment:
       <<: *mock-device-environment
-      ROBOT_ID: ${ROBOT_2_ID:-}
+      ROBOT_ID: 4eb0c6ba-2954-48c7-806b-624ea043d9f0
       ROBOT_SERIAL_NUM: PLEA-001
       ROBOT_IP_ADDRESS: 192.168.0.0
     volumes:
@@ -33,7 +33,7 @@ services:
     <<: *mock-device-base
     environment:
       <<: *mock-device-environment
-      ROBOT_ID: ${ROBOT_3_ID:-}
+      ROBOT_ID: fc3ff39f-5168-453a-b48e-04fbd8616767
       ROBOT_SERIAL_NUM: PLEA-002
       ROBOT_IP_ADDRESS: 192.168.1.2
     volumes:
@@ -43,9 +43,9 @@ services:
     <<: *mock-device-base
     environment:
       <<: *mock-device-environment
-      ROBOT_ID: ${ROBOT_4_ID:-}
-      ROBOT_SERIAL_NUM: PLC-004
-      ROBOT_IP_ADDRESS: 192.168.10.27
+      ROBOT_ID: fbba9569-b10a-40ba-bea1-6ad0c222ac20
+      ROBOT_SERIAL_NUM: PL-001
+      ROBOT_IP_ADDRESS: 1.2.2.2
     volumes:
       - ./data/robot-4:/data
 
@@ -53,8 +53,8 @@ services:
     <<: *mock-device-base
     environment:
       <<: *mock-device-environment
-      ROBOT_ID: ${ROBOT_5_ID:-}
-      ROBOT_SERIAL_NUM: PLC-005
-      ROBOT_IP_ADDRESS: 192.168.10.28
+      ROBOT_ID: e122c8c6-b557-4bf4-b8ad-8fbf6461e071
+      ROBOT_SERIAL_NUM: PL-0001
+      ROBOT_IP_ADDRESS: 192.168.1.1
     volumes:
       - ./data/robot-5:/data
