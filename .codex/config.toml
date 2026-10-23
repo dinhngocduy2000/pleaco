@@ -1,0 +1,15 @@
+
+# Pleco Codex configuration
+# Default model for the main Codex session
+model_reasoning_effort = "high"
+
+# ----------------------------------------
+# Multi-agent orchestration
+# ----------------------------------------
+
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 4
+
+sandbox_mode = "workspace-write"
+approval_policy = "on-request"
