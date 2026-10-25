@@ -23,22 +23,24 @@ Read the relevant repository's `AGENTS.md` before making changes.
 | `simulator` | Robot behavior, movement, MQTT, telemetry |
 | `realtime` | Cross-service messaging, contracts, reliability |
 | `devops` | Docker, CI/CD, infrastructure |
-| `qa` | Testing, integration, regression |
 | `reviewer` | Code quality, security, architecture |
 
 Select only the agents needed. Prefer direct execution for trivial tasks and a single specialist for isolated work.
 
 ## Delegation Rules
 
-1. Analyze the task and identify affected repositories.
-2. Define each agent's scope, deliverables, and file ownership.
-3. Establish shared API/message contracts before dependent implementation.
-4. Run independent tasks in parallel; sequence dependent work.
-5. Never allow concurrent edits to the same files.
-6. Have repository-owning agents implement changes; use `realtime` to coordinate cross-service contracts.
-7. Integrate changes and run relevant tests.
-8. Use `qa` and `reviewer` for complex or high-risk changes.
-9. Report results, failed verification, and unresolved issues.
+1. Default to executing tasks directly in the main agent.
+2. Spawn subagents only when specialization, independent investigation, or parallel work provides clear value.
+3. Prefer one subagent; use multiple only when justified.
+4. Identify affected repositories before delegation.
+5. Provide subagents with precise scope, relevant paths, known findings, deliverables, and file ownership.
+6. Establish shared API/message contracts before dependent implementation.
+7. Parallelize independent tasks; sequence dependent work.
+8. Never allow concurrent edits to the same files.
+9. Avoid duplicate repository exploration across agents.
+10. Use `realtime` for complex cross-service messaging and `reviewer` for high-risk changes when beneficial.
+11. Run relevant tests and verify integrated behavior.
+12. Report changes, verification results, and blockers concisely.
 
 ## Pleco Invariants
 

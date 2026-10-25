@@ -64,29 +64,6 @@ explicitly authorized by the orchestrator.
 
 # Architecture rules
 
-## Components
-
-- Prefer functional React components.
-- Follow established component organization.
-- Reuse existing shadcn/ui components.
-- Avoid unnecessary component abstractions.
-- Keep business logic separate from presentation.
-
-## State management
-
-- Follow existing Redux Toolkit conventions.
-- Always use Tanstack Query (React query) for server state.
-- Avoid duplicated server and client state.
-- Keep temporary UI state local when appropriate.
-- Avoid unnecessary global state updates.
-
-## Forms
-
-- Use React Hook Form with Zod.
-- Follow existing validation conventions.
-- Display meaningful validation errors.
-- Handle API errors consistently.
-
 ## Map visualization
 
 - Use established React-Konva patterns.
@@ -113,14 +90,6 @@ explicitly authorized by the orchestrator.
 - Respect permission-aware UI behavior.
 - Hide or disable unauthorized actions.
 - Never assume frontend checks replace backend RBAC.
-
-## Performance
-
-- Avoid unnecessary renders and allocations.
-- Memoize expensive computations when justified.
-- Keep map rendering performant.
-- Avoid introducing memory leaks.
-- Clean up event listeners and animation frames.
 
 # Implementation rules
 

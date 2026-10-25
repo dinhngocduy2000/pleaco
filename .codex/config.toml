@@ -6,10 +6,30 @@ model_reasoning_effort = "high"
 # ----------------------------------------
 # Multi-agent orchestration
 # ----------------------------------------
+sandbox_mode = "workspace-write"
+approval_policy = "on-request"
 
 [agents]
 enabled = true
 max_concurrent_threads_per_session = 4
 
-sandbox_mode = "workspace-write"
-approval_policy = "on-request"
+
+[agents.backend]
+description = "FastAPI and PostgreSQL specialist"
+config_file = "agents/backend.toml"
+
+[agents.frontend]
+description = "React and TypeScript specialist"
+config_file = "agents/frontend.toml"
+
+[agents.simulator]
+description = "Python robot simulation and MQTT specialist"
+config_file = "agents/simulator.toml"
+
+[agents.realtime]
+description = "Distributed messaging and realtime systems specialist"
+config_file = "agents/realtime.toml"
+
+[agents.reviewer]
+description = "Read-only code review and security specialist"
+config_file = "agents/reviewer.toml"
