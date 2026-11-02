@@ -1,8 +1,55 @@
 from datetime import datetime, timezone
+from decimal import Decimal
+from enum import Enum
 from typing import Literal
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, ConfigDict, IPvAnyAddress
+from pydantic import BaseModel, ConfigDict, Field, IPvAnyAddress, StrictBool, field_validator
+
+
+class Direction(str, Enum):
+    NORTH = "NORTH"
+    SOUTH = "SOUTH"
+    EAST = "EAST"
+    WEST = "WEST"
+
+
+class ActionType(str, Enum):
+    CLEANING = "CLEANING"
+
+
+class BaseAction(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    type: ActionType = ActionType.CLEANING
+    is_start: StrictBool
+    is_finish: StrictBool
+
+
+class CleaningAction(BaseAction):
+    type: Literal[ActionType.CLEANING] = ActionType.CLEANING
+    direction: Direction
+    distance: str = Field(default="1m", max_length=64, pattern=r"^(?:0|[1-9]\d*)(?:\.\d+)?m$")
+
+    @field_validator("distance")
+    @classmethod
+    def positive_distance(cls, value: str) -> str:
+        if Decimal(value[:-1]) <= 0:
+            raise ValueError("Distance must be positive")
+        return value
+
+
+class RobotCommand(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    robot_id: UUID
+    command_id: UUID
+    attempt: int = Field(strict=True, ge=1, le=4)
+    action: CleaningAction
+
+
+class RobotAcknowledgement(RobotCommand):
+    ack: StrictBool
 
 
 class RobotStatusMessage(BaseModel):

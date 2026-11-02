@@ -1,11 +1,11 @@
-import json
 import threading
 from pathlib import Path
 
 import paho.mqtt.client as mqtt
 
 from app.config import Settings
-from app.models import heartbeat_message, status_message
+from app.actions import RobotActionProcessor
+from app.models import RobotAcknowledgement, heartbeat_message, status_message
 
 
 class MockRobotMqttClient:
@@ -13,6 +13,8 @@ class MockRobotMqttClient:
         self.settings = settings
         self.sequence_number = self._load_sequence_number()
         self.topic = f"pleco/robots/{settings.ROBOT_ID}/status"
+        self.command_topic = f"pleco/robots/{settings.ROBOT_ID}/commands"
+        self.ack_topic = f"pleco/robots/{settings.ROBOT_ID}/acks"
         self.connected = threading.Event()
         self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id=str(settings.ROBOT_ID))
         if settings.MQTT_USERNAME:
@@ -20,6 +22,14 @@ class MockRobotMqttClient:
         self.client.on_connect = self._on_connect
         self.client.on_publish = self._on_publish
         self.client.on_disconnect = self._on_disconnect
+        self.client.on_message = self._on_message
+        self.actions = RobotActionProcessor(
+            robot_id=settings.ROBOT_ID,
+            state_path=settings.ROBOT_COMMAND_STATE_PATH or settings.ROBOT_STATE_PATH.with_name("commands.json"),
+            publish_ack=self._publish_ack,
+            delay_seconds=settings.ROBOT_COMMAND_ACK_DELAY_SECONDS,
+            force_failure=settings.ROBOT_COMMAND_FORCE_FAILURE,
+        )
         self._configure_last_will()
 
     def _configure_last_will(self) -> None:
@@ -45,6 +55,7 @@ class MockRobotMqttClient:
         self.client.loop_start()
 
     def disconnect(self) -> None:
+        self.actions.disconnect()
         self.connected.clear()
         self.publish("robot.offline", wait_for_confirmation=True)
         self.client.disconnect()
@@ -78,6 +89,8 @@ class MockRobotMqttClient:
         if reason_code == 0:
             print("Connected to MQTT broker", flush=True)
             self.connected.set()
+            self.actions.connect()
+            _client.subscribe(self.command_topic, qos=1)
             self.publish("robot.online")
         else:
             print(f"MQTT broker rejected connection: {reason_code}", flush=True)
@@ -86,12 +99,26 @@ class MockRobotMqttClient:
         print(f"MQTT publish confirmed message_id={message_id}", flush=True)
 
     def _on_disconnect(self, _client, _userdata, disconnect_flags, reason_code, _properties) -> None:
+        self.actions.disconnect()
         self.connected.clear()
         if reason_code != 0:
             print(
                 f"Unexpected MQTT disconnect: {reason_code} flags={disconnect_flags}",
                 flush=True,
             )
+
+    def _on_message(self, _client, _userdata, message) -> None:
+        # Retained movement commands must never restart work on connection.
+        if message.retain:
+            return
+        try:
+            self.actions.handle_message(message.topic, message.payload)
+        except OSError:
+            print("Unable to persist robot command receipt; ignoring command", flush=True)
+
+    def _publish_ack(self, message: RobotAcknowledgement) -> None:
+        if self.connected.is_set():
+            self.client.publish(self.ack_topic, message.model_dump_json(), qos=1, retain=False)
 
     def _load_sequence_number(self) -> int:
         path = self.settings.ROBOT_STATE_PATH
