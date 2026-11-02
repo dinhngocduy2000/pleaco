@@ -19,6 +19,6 @@ class Settings(BaseSettings):
     MQTT_PASSWORD: str = ""
     ROBOT_INITIAL_SEQUENCE: int = Field(default=0, ge=0)
     ROBOT_STATE_PATH: Path = Path("/data/sequence.txt")
-
-
-settings = Settings()
+    ROBOT_COMMAND_STATE_PATH: Path | None = None
+    ROBOT_COMMAND_ACK_DELAY_SECONDS: float = Field(default=20, gt=0, allow_inf_nan=False)
+    ROBOT_COMMAND_FORCE_FAILURE: bool = False

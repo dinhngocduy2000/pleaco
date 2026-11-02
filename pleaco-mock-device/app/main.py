@@ -1,13 +1,14 @@
 import signal
 import time
 
-from app.config import settings
+from app.config import Settings
 from app.mqtt_client import MockRobotMqttClient
 
 HEARTBEAT_INTERVAL_SECONDS = 10
 
 
 def main() -> None:
+    settings = Settings()
     client = MockRobotMqttClient(settings)
     should_stop = False
 
