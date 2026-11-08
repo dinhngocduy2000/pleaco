@@ -84,6 +84,10 @@ class RobotActionProcessor:
             if previous is not None:
                 if previous.command != command:
                     return False
+                logger.info(
+                    "Robot action duplicate robot_id=%s command_id=%s attempt=%s completed=%s",
+                    self.robot_id, command.command_id, command.attempt, previous.ack is not None,
+                )
                 if previous.ack is not None:
                     self._publish_ack(self._ack(previous))
                 return True
@@ -102,6 +106,10 @@ class RobotActionProcessor:
             timer.daemon = True
             self._pending[key] = timer
             timer.start()
+            logger.info(
+                "Robot action accepted robot_id=%s command_id=%s attempt=%s",
+                self.robot_id, command.command_id, command.attempt,
+            )
             return True
 
     def _complete(self, key: tuple[UUID, int]) -> None:
@@ -119,6 +127,10 @@ class RobotActionProcessor:
                 outcome.ack = None
                 logger.error("Unable to persist robot command outcome")
                 return
+            logger.info(
+                "Robot action completed robot_id=%s command_id=%s attempt=%s ack=%s",
+                self.robot_id, outcome.command.command_id, outcome.command.attempt, outcome.ack,
+            )
             self._publish_ack(self._ack(outcome))
 
     @staticmethod

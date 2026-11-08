@@ -1,3 +1,4 @@
+import logging
 import threading
 from pathlib import Path
 
@@ -6,6 +7,8 @@ import paho.mqtt.client as mqtt
 from app.config import Settings
 from app.actions import RobotActionProcessor
 from app.models import RobotAcknowledgement, heartbeat_message, status_message
+
+logger = logging.getLogger(__name__)
 
 
 class MockRobotMqttClient:
@@ -91,6 +94,7 @@ class MockRobotMqttClient:
             self.connected.set()
             self.actions.connect()
             _client.subscribe(self.command_topic, qos=1)
+            logger.info("Robot action MQTT subscription requested robot_id=%s topic=%s", self.settings.ROBOT_ID, self.command_topic)
             self.publish("robot.online")
         else:
             print(f"MQTT broker rejected connection: {reason_code}", flush=True)
@@ -111,6 +115,7 @@ class MockRobotMqttClient:
         # Retained movement commands must never restart work on connection.
         if message.retain:
             return
+        logger.info("Robot action MQTT message received robot_id=%s topic=%s", self.settings.ROBOT_ID, message.topic)
         try:
             self.actions.handle_message(message.topic, message.payload)
         except OSError:
@@ -119,6 +124,10 @@ class MockRobotMqttClient:
     def _publish_ack(self, message: RobotAcknowledgement) -> None:
         if self.connected.is_set():
             self.client.publish(self.ack_topic, message.model_dump_json(), qos=1, retain=False)
+            logger.info(
+                "Robot action ACK queued robot_id=%s command_id=%s attempt=%s ack=%s",
+                message.robot_id, message.command_id, message.attempt, message.ack,
+            )
 
     def _load_sequence_number(self) -> int:
         path = self.settings.ROBOT_STATE_PATH

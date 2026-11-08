@@ -1,4 +1,6 @@
+import logging
 import signal
+import sys
 import time
 
 from app.config import Settings
@@ -8,6 +10,7 @@ HEARTBEAT_INTERVAL_SECONDS = 10
 
 
 def main() -> None:
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s", stream=sys.stdout)
     settings = Settings()
     client = MockRobotMqttClient(settings)
     should_stop = False
