@@ -33,3 +33,9 @@ config_file = "agents/realtime.toml"
 [agents.reviewer]
 description = "Read-only code review and security specialist"
 config_file = "agents/reviewer.toml"
+
+# ---------------------------------------- MCP -----------------
+[mcp_servers.playwright]
+command = "npx"
+args = ["-y", "@playwright/mcp@latest"]
+startup_timeout_sec = 60
