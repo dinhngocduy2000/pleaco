@@ -166,6 +166,21 @@ class ActionsTest(unittest.TestCase):
         self.assertEqual([ack.attempt for ack in self.acks], [1, 2, 3, 4])
         self.assertTrue(all(ack.ack is False for ack in self.acks))
 
+    def test_four_step_loop_echoes_flags_with_shared_command_id(self):
+        command = self.command()
+        flags = [(True, False), (False, False), (False, False), (False, True)]
+        for attempt, (is_start, is_finish) in enumerate(flags, start=1):
+            step = {
+                **command,
+                "attempt": attempt,
+                "action": {**command["action"], "is_start": is_start, "is_finish": is_finish},
+            }
+            self.assertTrue(self.receive(step))
+            self.timers[-1].fire()
+            self.assertEqual(self.acks[-1].model_dump(mode="json"), {**step, "ack": True})
+        self.assertEqual([ack.command_id for ack in self.acks], [self.acks[0].command_id] * 4)
+        self.assertEqual([ack.attempt for ack in self.acks], [1, 2, 3, 4])
+
     def test_completed_result_survives_restart_and_expires_after_twelve_hours(self):
         command = self.command()
         self.receive(command)
