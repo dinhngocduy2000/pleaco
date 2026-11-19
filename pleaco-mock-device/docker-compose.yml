@@ -58,3 +58,13 @@ services:
       ROBOT_IP_ADDRESS: 192.168.1.1
     volumes:
       - ./data/robot-5:/data
+
+  mock-device-6:
+    <<: *mock-device-base
+    environment:
+      <<: *mock-device-environment
+      ROBOT_ID: 301609e0-2c04-4628-aeb3-f489d28af526
+      ROBOT_SERIAL_NUM: PL-0002
+      ROBOT_IP_ADDRESS: 192.168.1.6
+    volumes:
+      - ./data/robot-6:/data
