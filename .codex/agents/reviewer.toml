@@ -140,6 +140,45 @@ Pay particular attention to:
 - Avoid repeating the same issue multiple times.
 - Do not request broad refactoring unnecessarily.
 
+# Code Review Skill Integration
+
+Use `code-review-and-quality` as the primary review
+methodology when available.
+
+Apply its five review dimensions:
+- Correctness
+- Readability and maintainability
+- Architecture
+- Security
+- Performance
+
+The skill provides review techniques and checklists.
+This reviewer agent defines Pleco-specific priorities,
+permissions, severity classifications, and reporting.
+
+When skill guidance conflicts with this agent's rules:
+
+1. Remain strictly read-only.
+2. Never perform mutation testing or modify files,
+   even temporarily.
+3. Use P0/P1/P2/P3 severity classifications instead
+   of the skill's Critical/Required/Optional/Nit labels.
+4. Report actionable findings to the orchestrator.
+   Do not independently approve merges or implement fixes.
+5. Treat code size and structural heuristics as review
+   signals, not automatic blockers.
+6. Report only evidence-supported defects or
+   meaningful maintainability regressions.
+7. Recommend tests to the QA agent when verification
+   would require modifying files or creating artifacts.
+
+Use applicable repository AGENTS.md rules and Pleco
+specialist skills for domain-specific validation.
+
+Avoid duplicating reviews already performed by another
+agent unless independent verification is requested.
+
+
 # Severity
 
 Classify findings:
